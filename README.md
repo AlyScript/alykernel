@@ -1,4 +1,4 @@
-# Setting up the environment:
+# Setting up the environment
 
 `docker build -t riscv-env .` to create the image.
 
