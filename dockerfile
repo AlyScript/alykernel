@@ -6,16 +6,8 @@ WORKDIR /workspace
 
 # Install dependencies
 RUN apt update && apt install -y \
-    gcc-riscv64-unknown-elf \
-    binutils-riscv64-unknown-elf \
-    qemu-system-misc \
-    build-essential \
-    git \
-    wget \
-    python3 \
-    cmake \
-    ninja-build \
-    && rm -rf /var/lib/apt/lists/*
+    make \
+    nasm
 
 # Add RISC-V toolchain to PATH
 ENV PATH="/usr/bin:$PATH"
