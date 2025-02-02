@@ -42,7 +42,7 @@ main:
     mov gs, ax
 
     ; Set up stack
-    mov ss, ax 
+    mov ss, ax
     mov sp, 0x7C00 ; Stack pointer is at beginning of bootloader (it grows downwards)
     
     ; print message
