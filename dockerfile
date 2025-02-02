@@ -7,7 +7,9 @@ WORKDIR /workspace
 # Install dependencies
 RUN apt update && apt install -y \
     make \
-    nasm
+    nasm \
+    dosfstools \
+    mtools
 
 # Add RISC-V toolchain to PATH
 ENV PATH="/usr/bin:$PATH"
