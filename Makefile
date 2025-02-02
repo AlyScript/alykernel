@@ -9,10 +9,10 @@ BUILD_DIR=build
 #
 floppy_image: $(BUILD_DIR)/main_floppy.img
 $(BUILD_DIR)/main_floppy.img: bootloader kernel
-	dd if=/dev/zero of=$(BUILD_DIR)/main_floppy.img bs=512 count=2880
-	mkfs.fat -F 12 -n "NBOS" $(BUILD_DIR)/main_floppy.img
-	dd if=$(BUILD_DIR)/bootloader.bin of=$(BUILD_DIR)/main_floppy.img conv=notrunc
-	mcopy -i $(BUILD_DIR)/main_floppy.img $(BUILD_DIR)/kernel.bin "::kernel.bin"
+	dd if=/dev/zero of=$(BUILD_DIR)/main_floppy.img bs=512 count=2880				# 1.44MB Empty floppy disk (512 byte blocks * 2880 blocks)
+	mkfs.fat -F 12 -n "NBOS" $(BUILD_DIR)/main_floppy.img							# Format floppy disk with FAT12
+	dd if=$(BUILD_DIR)/bootloader.bin of=$(BUILD_DIR)/main_floppy.img conv=notrunc	# Copy bootloader to first sector of floppy disk, without truncating the file so that the rest of the disk is not overwritten
+	mcopy -i $(BUILD_DIR)/main_floppy.img $(BUILD_DIR)/kernel.bin "::kernel.bin"	# Copy kernel to floppy disk
 #
 # Bootloader
 #
