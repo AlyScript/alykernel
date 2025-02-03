@@ -3,9 +3,9 @@ bits 16    ; 16 bit mode for backward compatibility
 
 %define ENDL 0x0D, 0x0A
 
-;
+; 
 ; FAT12 Header (A.K.A BIOS Parameter Block)
-;    
+; 
 jmp short start
 nop
 
@@ -15,7 +15,7 @@ bdb_sectors_per_cluster:     db 1
 bdb_reserved_sectors:        dw 1
 bdb_fat_count:               db 2
 dir_entry_count:             dw 0E0h
-bdb_total_sectors:           dw 2880    ; 2880 * 512B Sectors = 1.44MB
+bdb_total_sectors:           dw 2880    ; 2880 * 512B Sectors = 1.44MB (The size of a floppy disk)
 bdb_media_descriptor:        db 0F0h
 bdb_sectors_per_fat:         dw 9
 bdb_sectors_per_track:       dw 18
