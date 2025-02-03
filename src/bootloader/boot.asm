@@ -3,6 +3,35 @@ bits 16    ; 16 bit mode for backward compatibility
 
 %define ENDL 0x0D, 0x0A
 
+;
+; FAT12 Header (A.K.A BIOS Parameter Block)
+;    
+jmp short start
+nop
+
+bdb_oem:                     db "MSWIN4.1"
+bdb_bytes_per_sector:        dw 512
+bdb_sectors_per_cluster:     db 1
+bdb_reserved_sectors:        dw 1
+bdb_fat_count:               db 2
+dir_entry_count:             dw 0E0h
+bdb_total_sectors:           dw 2880    ; 2880 * 512B Sectors = 1.44MB
+bdb_media_descriptor:        db 0F0h
+bdb_sectors_per_fat:         dw 9
+bdb_sectors_per_track:       dw 18
+bdb_head_count:              dw 2
+bdb_hidden_sectors:          dd 0
+bdb_total_sectors_big:       dd 0
+
+; Extended Boot Record
+ebr_physical_drive_number:  db 0       ; 0x80 for hard drive, 0x00 for floppy
+ebr_reserved:               db 0
+ebr_ext_boot_signature:     db 29h
+ebr_volume_id:              dd 0
+ebr_volume_label:           db "ALYKERNEL  "
+ebr_file_system:            db "FAT12   "
+
+
 start:
     jmp main
 
