@@ -1,4 +1,4 @@
-<img src="https://imgur.com/Jo7l9Q1" alt="logo" width="500">
+<img src="https://i.imgur.com/Jo7l9Q1.png" alt="logo" width="500">
 
 alykernel is a simple kernel designed for the x86 architecture.
 
