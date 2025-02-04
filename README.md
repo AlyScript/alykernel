@@ -1,5 +1,4 @@
-
-# alykernel
+<img src="https://imgur.com/Jo7l9Q1" alt="logo" width="500">
 
 alykernel is a simple kernel designed for the x86 architecture.
 
@@ -71,4 +70,4 @@ alykernel makes use of the simple FAT12 file system, since it is by far the most
 - The File Allocation Table (FAT)
 - The directory and data area
 
-The [GNU Mtools](https://www.gnu.org/software/mtools/) package (one of the dependencies in the dockerfile) provides a number of utilities that can be used for manipulating files in the FAT12 filesystem.
+The [mtools](https://www.gnu.org/software/mtools/) package (one of the dependencies in the dockerfile) provides a number of utilities that can be used for manipulating files in the FAT12 filesystem.
