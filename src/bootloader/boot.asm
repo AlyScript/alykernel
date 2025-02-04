@@ -84,6 +84,47 @@ main:
 .halt:
     jmp .halt
 
+;
+; Disk Routines
+;
+
+; Converts an LBA address to CHS
+; Params:
+;   ax = LBA address
+; Returns:
+;   - cx [bits 0:5]: sector number
+;   - cx [bits 6:15]: cylinder number
+;   - dh: head number
+
+lba_to_chs:
+
+    ; Note that cl and ch contain the 8 lower and 8 upper bits of cx in x86
+    ; So we can use them to store the cylinder number
+
+    push ax
+    push dx
+
+    xor dx, dx                          ; Clear dx
+    div word [bdb_sectors_per_track]    ; ax = LBA / SPT
+                                        ; dx = LBA % SPT
+
+    inc dx                              ; dx = (LBA % SPT) + 1 = sector
+    mov cx, dx                          ; cx = sector
+
+    xor dx, dx                          ; Clear dx
+    div word [bdb_head_count]           ; ax = LBA / (SPT * HPC) = cylinder
+                                        ; dx = LBA % (SPT * HPC) = head
+
+    mov dh, dl                          ; dh = head
+    mov ch, al                          ; ch = cylinder low byte (lower 8 bits)
+    shl ah, 6                           ; ah = cylinder high byte (upper 2 bits)
+    or cl, ah                           ; put the upper 2 bits of cylinder into cl
+
+    pop ax
+    mov dl, al                          ; we only restore dl
+    pop ax
+    ret
+
 msg_hello: db 'Hello, World!', ENDL, 0
 
 ; 0x55AA is the magic number for the bootloader
