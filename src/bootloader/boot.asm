@@ -5,6 +5,7 @@ bits 16    ; 16 bit mode for backward compatibility
 
 ; 
 ; FAT12 Header (A.K.A BIOS Parameter Block)
+; See FAT12 specification for more information
 ; 
 jmp short start
 nop
@@ -23,7 +24,7 @@ bdb_head_count:              dw 2
 bdb_hidden_sectors:          dd 0
 bdb_total_sectors_big:       dd 0
 
-; Extended Boot Record
+; Extended Boot Record (Again for FAT12)
 ebr_physical_drive_number:  db 0       ; 0x80 for hard drive, 0x00 for floppy
 ebr_reserved:               db 0
 ebr_ext_boot_signature:     db 29h
