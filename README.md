@@ -26,7 +26,7 @@ Build the docker image
 Run the container
 
 ```bash
-  docker run --rm -it -v $(pwd):/workspace riscv-env
+  docker run --rm -it -v $(pwd):/alykernel riscv-env
 ```
 
 Build the project
