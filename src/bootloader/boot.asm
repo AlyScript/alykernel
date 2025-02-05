@@ -1,5 +1,5 @@
 org 0x7C00 ; BIOS loads the bootloader at 0x7C00
-bits 16    ; 16 bit mode for backward compatibility
+bits 16    ; 16 bit 'real' mode for backward compatibility
 
 %define ENDL 0x0D, 0x0A
 
@@ -74,14 +74,38 @@ main:
     ; Set up stack
     mov ss, ax
     mov sp, 0x7C00 ; Stack pointer is at beginning of bootloader (it grows downwards)
+
+    ; Read the first sector of the disk
+    ; BIOS should set dl to the drive number
+    mov [ebr_physical_drive_number], dl
+
+    mov ax, 1           ; LBA address of the first sector
+    mov cl, 1           ; number of sectors to read
+    mov bx, 0x7E00      ; memory address where to store the data - this should be after bootloader
+    call disk_read
     
     ; print message
     mov si, msg_hello
     call puts
 
+    cli
     hlt
 
+;
+; Error handlers
+;
+floppy_error:
+    mov si, msg_read_error
+    call puts
+    jmp wait_key_and_reboot
+
+wait_key_and_reboot:
+    mov ah, 0           ; read keyboard input
+    int 16h             ; wait for key press
+    jmp 0FFFFh:0000h    ; jump to beginning of BIOS, rebooting the system
+
 .halt:
+    cli                 ; disable interrupts so we cant get out of half state
     jmp .halt
 
 ;
@@ -125,7 +149,71 @@ lba_to_chs:
     pop ax
     ret
 
-msg_hello: db 'Hello, World!', ENDL, 0
+;
+; https://stanislavs.org/helppc/int_13-2.html
+; Read sectors from disk
+; Params:
+;   - ax = LBA address
+;   - cl: number of sectors to read (up to 128)
+;   - dl: drive number
+;   - es:bx: memory address where to store and read data
+disk_read:
+    push ax                             ; save registers
+    push bx
+    push cx
+    push dx
+    push di
+
+    push cx                             ; temoporarily save CL (number of sectors to read)
+    call lba_to_chs                     ; convert LBA to CHS
+    pop ax                              ; AL = number of sectors to read (top of stack was CL)
+
+    mov ah, 02h                          ; BIOS read sector function
+    mov di, 3                            ; number of retries
+
+.retry:
+    pusha                               ; save registers - we don't know what the BIOS will change
+    stc                                 ; set carry flag, as per BIOS documentation some BIOSes don't set it
+    int 13h                             ; call BIOS interrupt
+    jnc .success                        ; if carry flag is not set, we are good
+
+    ; read failed
+    popa
+    call disk_reset                     ; reset disk
+    
+    dec di
+    test di, di
+    jnz .retry
+
+.fail:
+    ; after all attempts are exhausted
+    jmp floppy_error
+
+.success:
+    popa
+
+    pop di                             ; save registers
+    pop dx
+    pop cx
+    pop bx
+    pop ax
+    ret
+
+;
+;
+;
+disk_reset:
+    pusha
+    mov ah, 0                           ; reset disk
+    stc                                 ; set carry flag
+    int 13h                             ; call BIOS interrupt
+    jc floppy_error                     ; if carry flag is set, we have an error     
+    popa
+    ret
+
+
+msg_hello:      db 'Hello, World!', ENDL, 0
+msg_read_error: db 'Error reading disk!', ENDL, 0
 
 ; 0x55AA is the magic number for the bootloader
 ; BIOS Expects that the last 2 bytes of 512 byte sector is 0x55AA
