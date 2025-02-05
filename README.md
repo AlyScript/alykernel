@@ -41,14 +41,16 @@ To the clean the build directory
 
 You can now boot alykernel! To do this using [qemu](https://www.qemu.org/)
 ```bash
-  qemu-system-i386 -fda build/main_floppy.img
+  ./run.sh
 ```
 
 
 ## Appendix
 
 ### Booting
-The kernel boots via legacy BIOS booting from a floppy disk (typically 1.44 MB in size). The BIOS loads the boot sector at address `0x7C00` and we have 512 bytes to work with. It also expects that the last two bytes of the 512 byte sector are AA and 55 respectively.
+The kernel boots via [legacy BIOS booting](https://wiki.osdev.org/System_Initialization_(x86)) from a floppy disk (typically 1.44 MB in size). The BIOS loads the boot sector at address `0x7C00` and we have 512 bytes to work with. It also expects that the last two bytes of the 512 byte sector are AA and 55 respectively.
+
+There are very few things that are standardized about the state of the system, when the BIOS transfers control to the bootsector. The only things that are (nearly) certain are that the bootsector code is loaded and running at physical address 0x7c00, the CPU is in 16-bit [Real Mode](https://wiki.osdev.org/Real_Mode), the CPU register called DL contains the "drive number", and that only 512 bytes of the bootsector have been loaded.
 
 ### File Systems
 Our BIOS unfortunately uses [Cylinder-head-sector](https://en.wikipedia.org/wiki/Cylinder-head-sector) (CHS) addressing to give addresses to each physical block of data on the floppy disk.
