@@ -1,4 +1,4 @@
-<img src="https://i.imgur.com/Jo7l9Q1.png" alt="logo" width="500">
+<img src="https://i.imgur.com/Jo7l9Q1.png" alt="logo" width="1000">
 
 alykernel is a simple kernel designed for the x86 architecture.
 
@@ -56,6 +56,7 @@ This is very outdated and unnecessary for our purposes, so instead we make use o
 - C = LBA ÷ (HPC × SPT)
 - H = (LBA ÷ SPT) mod HPC
 - S = (LBA mod SPT) + 1
+
 where
 - C, H and S are the cylinder number, the head number, and the sector number
 - LBA is the logical block address
