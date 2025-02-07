@@ -15,7 +15,7 @@ bdb_bytes_per_sector:        dw 512
 bdb_sectors_per_cluster:     db 1
 bdb_reserved_sectors:        dw 1
 bdb_fat_count:               db 2
-dir_entry_count:             dw 0E0h
+dir_entry_count:             dw 0E0h    ; 224 entries in root directory - 224 * 32 bytes = 7168 bytes (14 sectors)
 bdb_total_sectors:           dw 2880    ; 2880 * 512B Sectors = 1.44MB (The size of a floppy disk)
 bdb_media_descriptor:        db 0F0h
 bdb_sectors_per_fat:         dw 9
@@ -45,7 +45,7 @@ puts:
     push si
     push ax
 .loop:
-    lodsb               ; load next charcter into al
+    lodsb               ; load next character into al
     or al, al           ; check if al is 0 (end of string)
     jz .done
 
