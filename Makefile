@@ -17,6 +17,7 @@ $(BUILD_DIR)/main_floppy.img: bootloader kernel
 	mkfs.fat -F 12 -n "NBOS" $(BUILD_DIR)/main_floppy.img							# Format floppy disk with FAT12
 	dd if=$(BUILD_DIR)/bootloader.bin of=$(BUILD_DIR)/main_floppy.img conv=notrunc	# Copy bootloader to first sector of floppy disk, without truncating the file so that the rest of the disk is not overwritten
 	mcopy -i $(BUILD_DIR)/main_floppy.img $(BUILD_DIR)/kernel.bin "::kernel.bin"	# Copy kernel to floppy disk
+	mcopy -i $(BUILD_DIR)/main_floppy.img test.txt "::test.txt"						
 #
 # Bootloader
 #
