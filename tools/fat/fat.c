@@ -51,7 +51,7 @@ typedef struct {
 } __attribute__((packed)) DirectoryEntry;
 
 BootSector g_BootSector;
-uint8_t g_Fat = NULL;
+uint8_t* g_Fat = NULL;
 DirectoryEntry* g_RootDirectory = NULL;
 
 /*
@@ -114,7 +114,7 @@ int main(int argc, char *argv[]) {
 
     FILE *disk = fopen(argv[1], "rb");
     if (!disk) {
-        fprintf("Failed to open disk image %s\n", argv[1]);
+        fprintf(stderr, "Failed to open disk image %s\n", argv[1]);
         return -1;
     }
 
