@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 typedef uint8_t bool;
 #define true 1
@@ -53,6 +54,7 @@ typedef struct {
 BootSector g_BootSector;
 uint8_t* g_Fat = NULL;
 DirectoryEntry* g_RootDirectory = NULL;
+uint32_t g_RootDirectoryEnd;
 
 /*
 - Read the boot sector from the disk and store it in g_BootSector in memory.
@@ -93,6 +95,8 @@ bool readRootDirectory(FILE* disk) {
     uint32_t sectors = (size / g_BootSector.BytesPerSector);
     if (size % g_BootSector.BytesPerSector > 0) 
         sectors++;
+
+    g_RootDirectoryEnd = lba + sectors;
     g_RootDirectory = (DirectoryEntry*) malloc(sectors * g_BootSector.BytesPerSector);
     return readSectors(disk, lba, sectors, g_RootDirectory);
 }
@@ -104,6 +108,30 @@ DirectoryEntry* findFile(const char* name) {
         }
     }
     return NULL;
+}
+
+/*
+- Read a file from the disk and store it in memory.
+- The file is read cluster by cluster, and the FAT is used to determine the next cluster.
+*/
+bool readFile(DirectoryEntry* fileEntry, FILE* disk, uint8_t* outputBuffer) {
+    bool ok = true;
+    uint16_t currentCluster = fileEntry->FirstClusterLow;
+
+    do {
+        uint32_t lba = g_RootDirectoryEnd + (currentCluster - 2) * g_BootSector.SectorsPerCluster;
+        ok = ok && readSectors(disk, lba, g_BootSector.SectorsPerCluster, outputBuffer);
+        outputBuffer += g_BootSector.SectorsPerCluster * g_BootSector.BytesPerSector;
+
+        uint32_t fatOffset = (currentCluster * 3) / 2;
+        if (currentCluster % 2 == 0) {
+            currentCluster = (*(uint16_t*)(g_Fat + fatOffset)) & 0x0FFF;
+        } else {
+            currentCluster = (*(uint16_t*)(g_Fat + fatOffset)) >> 4;
+        }
+    } while (ok && currentCluster < 0xFF8);
+
+    return ok;
 }
 
 int main(int argc, char *argv[]) {
@@ -144,6 +172,22 @@ int main(int argc, char *argv[]) {
         return -5;
     }
 
+    uint8_t* buffer = (uint8_t*) malloc(fileEntry->Size + g_BootSector.BytesPerSector); // Extra sector for padding and so we don't overwrite anything / segfault
+    if (!readFile(fileEntry, disk, buffer)) {
+        fprintf(stderr, "Failed to read file %s\n", argv[2]);
+        free(g_Fat);
+        free(g_RootDirectory);
+        free(buffer);
+        return -6;
+    }
+
+    for (size_t i = 0; i < fileEntry->Size; i++) {
+        if (isprint(buffer[i])) fputc(buffer[i], stdout);
+        else printf("<%02x>", buffer[i]);
+    }
+    printf("\n");
+
+    free(buffer);
     free(g_Fat);
     free(g_RootDirectory);
     return 0;
