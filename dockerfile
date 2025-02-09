@@ -9,7 +9,8 @@ RUN apt update && apt install -y \
     make \
     nasm \
     dosfstools \
-    mtools
+    mtools \
+    gcc
 
 # Add RISC-V toolchain to PATH
 ENV PATH="/usr/bin:$PATH"
