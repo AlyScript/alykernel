@@ -77,11 +77,11 @@ start:
     inc dh
     mov [bdb_head_count], dh
 
-    ; computer LBA of root directory = reserved + fats * sectors per fat
+    ; compute LBA of root directory = reserved + fats * sectors per fat
     mov ax, [bdb_sectors_per_fat]
     mov bl, [bdb_fat_count]
-    xor bh, bh                               ; we only want the lower 8 bits of bl
-    mul bx                                   ; fats * sectors per fat
+    xor bh, bh                               ; we only want the lower 8 bits of bx
+    mul bx                                   ; fats * sectors per fat (in ax)
     add ax, [bdb_reserved_sectors]           ; reserved + fats * sectors per fat
     push ax                                  ; save LBA of root directory
 
@@ -116,7 +116,7 @@ root_dir_after:
     pop di
     je .found_kernel                         ; if we found the kernel, jump to .found_kernel
 
-    add di, 32                               ; move to the next directory entry
+    add di, 32                               ; move to the next directory entry (each entry is 32 bytes)
     inc bx                                   ; increment the number of entries we have checked
     cmp bx, [dir_entry_count]                ; check if we have checked all entries
     jl .search_kernel                        ; if we havent checked all entries, jump to .search_kernel
@@ -146,7 +146,7 @@ root_dir_after:
     ; Read next cluster
     mov ax, [kernel_cluster]
 
-    ; this is bad :0 and hardcoded... i will fix it soon
+    ; this is bad :o and hardcoded... i will fix it soon as it only works for a 1.44MB floppy disk
     add ax, 31                              ; first cluster = (kernel cluster number - 2) * sectors per cluster + kernel_cluster  
                                             ; start sector = reserved + fats + root directory size = 1 + 18 * 14 = 33
 
@@ -154,7 +154,7 @@ root_dir_after:
     mov dl, [ebr_physical_drive_number]
     call disk_read
 
-    add bx, [bdb_bytes_per_sector]
+    add bx, [bdb_bytes_per_sector]          ; NOTE: this could overlow if kernel.bin is larger than 64 KiB (our registers are only 16 bits)
 
     ; compute location of next cluster
     mov ax, [kernel_cluster]
@@ -179,7 +179,7 @@ root_dir_after:
 
 .next_cluster_after:
     cmp ax, 0x0FF8                          ; check if we are at the end of the file
-    jae .read_finish
+    jae .read_finish                        ; if we are at the end of the file, jump to kernel
 
     mov [kernel_cluster], ax
     jmp .load_kernel_loop
@@ -315,8 +315,8 @@ disk_read:
     mov di, 3                            ; number of retries
 
 .retry:
-    pusha                               ; save registers - we don't know what the BIOS will change
-    stc                                 ; set carry flag, as per BIOS documentation some BIOSes don't set it
+    pusha                               ; save registers - we dont know what the BIOS will change
+    stc                                 ; set carry flag, as per BIOS documentation some BIOSes dont set it
     int 13h                             ; call BIOS interrupt
     jnc .success                        ; if carry flag is not set, we are good
 
