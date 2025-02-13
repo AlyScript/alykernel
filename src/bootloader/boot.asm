@@ -32,9 +32,61 @@ ebr_volume_id:              dd 0
 ebr_volume_label:           db "ALYKERNEL  "
 ebr_file_system:            db "FAT12   "
 
+;
+; Code goes here
+;
 
-start:
-    jmp main
+main:
+    
+    ; Set up data segments
+    mov ax, 0
+    mov ds, ax
+    mov es, ax
+
+    ; Set up stack
+    mov ss, ax
+    mov sp, 0x7C00 ; Stack pointer is at beginning of bootloader (it grows downwards)
+
+    ; Some BIOSes may start us at 07C0:0000, so we need to jump to 0000:7C00, this ensures that
+    ; we are in the correct segment
+    push es
+    push word .after
+
+.after:
+
+    ; Read the first sector of the disk
+    ; BIOS should set dl to the drive number
+    mov [ebr_physical_drive_number], dl
+
+    mov ax, 1           ; LBA address of the first sector
+    mov cl, 1           ; number of sectors to read
+    mov bx, 0x7E00      ; memory address where to store the data - this should be after bootloader
+    call disk_read
+    
+    ; print message
+    mov si, msg_loading
+    call puts
+
+    cli
+    hlt
+
+;
+; Error handlers
+;
+
+floppy_error:
+    mov si, msg_read_error
+    call puts
+    jmp wait_key_and_reboot
+
+wait_key_and_reboot:
+    mov ah, 0           ; read keyboard input
+    int 16h             ; wait for key press
+    jmp 0FFFFh:0000h    ; jump to beginning of BIOS, rebooting the system
+
+.halt:
+    cli                 ; disable interrupts so we cant get out of half state
+    jmp .halt
 
 
 ; Print a string to the screen
@@ -61,52 +113,6 @@ puts:
     pop si
     ret
 
-
-main:
-    
-    ; Set up data segments
-    mov ax, 0
-    mov ds, ax
-    mov es, ax
-    mov fs, ax
-    mov gs, ax
-
-    ; Set up stack
-    mov ss, ax
-    mov sp, 0x7C00 ; Stack pointer is at beginning of bootloader (it grows downwards)
-
-    ; Read the first sector of the disk
-    ; BIOS should set dl to the drive number
-    mov [ebr_physical_drive_number], dl
-
-    mov ax, 1           ; LBA address of the first sector
-    mov cl, 1           ; number of sectors to read
-    mov bx, 0x7E00      ; memory address where to store the data - this should be after bootloader
-    call disk_read
-    
-    ; print message
-    mov si, msg_hello
-    call puts
-
-    cli
-    hlt
-
-;
-; Error handlers
-;
-floppy_error:
-    mov si, msg_read_error
-    call puts
-    jmp wait_key_and_reboot
-
-wait_key_and_reboot:
-    mov ah, 0           ; read keyboard input
-    int 16h             ; wait for key press
-    jmp 0FFFFh:0000h    ; jump to beginning of BIOS, rebooting the system
-
-.halt:
-    cli                 ; disable interrupts so we cant get out of half state
-    jmp .halt
 
 ;
 ; Disk Routines
@@ -212,7 +218,7 @@ disk_reset:
     ret
 
 
-msg_hello:      db 'Hello, World!', ENDL, 0
+msg_loading:      db 'Loading', ENDL, 0
 msg_read_error: db 'Error reading disk!', ENDL, 0
 
 ; 0x55AA is the magic number for the bootloader
