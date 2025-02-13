@@ -66,7 +66,7 @@ start:
     ; instead of relying on data from formatted disk
     push es
     mov ah, 08h
-    int 13h
+    int 13h                                 ; see https://www.stanislavs.org/helppc/int_13-8.html
     jc floppy_error
     pop es
 
