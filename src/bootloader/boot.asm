@@ -342,8 +342,9 @@ disk_read:
     pop ax
     ret
 
-;
-;
+; Resets disk controller
+; Params:
+;   dl: drive number
 ;
 disk_reset:
     pusha
@@ -364,10 +365,11 @@ kernel_cluster:         dw 0
 KERNEL_LOAD_SEGMENT     equ 0x2000
 KERNEL_LOAD_OFFSET      equ 0
 
-buffer:                 
 
 ; 0x55AA is the magic number for the bootloader
 ; BIOS Expects that the last 2 bytes of 512 byte sector is 0x55AA
 ; So we pad the rest with 510 bytes
 times 510 - ($ - $$) db 0
 dw 0AA55h
+
+buffer:                 
