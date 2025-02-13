@@ -36,7 +36,7 @@ ebr_file_system:            db "FAT12   "
 ; Code goes here
 ;
 
-main:
+start:
     
     ; Set up data segments
     mov ax, 0
@@ -101,7 +101,7 @@ root_dir_after:
     mov cl, al                               ; cl = number of sectors to read = size of root directory
     pop ax                                   ; ax = LBA of root directory 
     mov dl, [ebr_physical_drive_number]      ; dl = drive number (we saved it previously)
-    mov bd, buffer                           ; es:bx = buffer
+    mov bx, buffer                           ; es:bx = buffer
     call disk_read
 
     ; search for kernel.bin
@@ -172,7 +172,7 @@ root_dir_after:
 
 .odd:
     shr ax, 4                               ; get the high 12 bits of the entry
-    jmp next_cluster_after
+    jmp .next_cluster_after
 
 .even:
     and ax, 0x0FFF                          ; get the low 12 bits of the entry
@@ -364,7 +364,7 @@ kernel_cluster:         dw 0
 KERNEL_LOAD_SEGMENT     equ 0x2000
 KERNEL_LOAD_OFFSET      equ 0
 
-buffer:                 times 512 db 0
+buffer:                 
 
 ; 0x55AA is the magic number for the bootloader
 ; BIOS Expects that the last 2 bytes of 512 byte sector is 0x55AA
