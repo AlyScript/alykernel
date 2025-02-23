@@ -89,3 +89,6 @@ alykernel makes use of the simple FAT12 file system, since it is by far the most
 - The directory and data area
 
 The [mtools](https://www.gnu.org/software/mtools/) package (one of the dependencies in the dockerfile) provides a number of utilities that can be used for manipulating files in the FAT12 filesystem.
+
+### Calling Conventions
+We use the [CDECL](https://en.wikipedia.org/wiki/X86_calling_conventions#cdecl) calling convention.
