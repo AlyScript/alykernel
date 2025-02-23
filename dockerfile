@@ -10,7 +10,9 @@ RUN apt update && apt install -y \
     nasm \
     dosfstools \
     mtools \
-    gcc
+    gcc \
+    curl \
+    git
 
 # Copy the locally installed Open Watcom compiler into the image
 COPY ./usr/bin/watcom /usr/bin/watcom
@@ -26,3 +28,5 @@ ENV PATH="/usr/bin:$PATH"
 
 # Default command: start a bash shell
 CMD ["/bin/bash"]
+
+RUN bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)"
