@@ -109,7 +109,7 @@ root_dir_after:
     mov di, buffer                           ; di points to the current directory entry  (filename field is first entry so di will point directly to it)
 
 .search_kernel:
-    mov si, file_kernel_bin                  ; si points to the filename we are looking for
+    mov si, file_stage2_bin                  ; si points to the filename we are looking for
     mov cx, 11                               ; we are looking for 11 characters
     push di
     repe cmpsb                               ; while CX != 0, Compare byte at address DS:(E)SI with byte at address ES:(E)DI
@@ -127,7 +127,7 @@ root_dir_after:
 
     ; di should have the address to the entry of the kernel
     mov ax, [di + 26]                       ; get the starting cluster of the kernel (see in the FAT12 specification) by offsetting di by 26 bytes
-    mov [kernel_cluster], ax                
+    mov [stage2_cluster], ax                
 
     ; now load FAT from disk into memory
     ; all we need to do is set up the correct parameters and call disk_read
@@ -144,10 +144,10 @@ root_dir_after:
 
 .load_kernel_loop:
     ; Read next cluster
-    mov ax, [kernel_cluster]
+    mov ax, [stage2_cluster]
 
     ; this is bad :o and hardcoded... i will fix it soon as it only works for a 1.44MB floppy disk
-    add ax, 31                              ; first cluster = (kernel cluster number - 2) * sectors per cluster + kernel_cluster  
+    add ax, 31                              ; first cluster = (kernel cluster number - 2) * sectors per cluster + stage2_cluster  
                                             ; start sector = reserved + fats + root directory size = 1 + 18 * 14 = 33
 
     mov cl, 1
@@ -157,7 +157,7 @@ root_dir_after:
     add bx, [bdb_bytes_per_sector]          ; NOTE: this could overlow if kernel.bin is larger than 64 KiB (our registers are only 16 bits)
 
     ; compute location of next cluster
-    mov ax, [kernel_cluster]
+    mov ax, [stage2_cluster]
     mov cx, 3
     mul cx                                  ; multiply by 3 to get the index of the entry in FAT since each entry is 12 bits (1.5 bytes)
     mov cx, 2
@@ -181,7 +181,7 @@ root_dir_after:
     cmp ax, 0x0FF8                          ; check if we are at the end of the file
     jae .read_finish                        ; if we are at the end of the file, jump to kernel
 
-    mov [kernel_cluster], ax
+    mov [stage2_cluster], ax
     jmp .load_kernel_loop
 
 .read_finish:
@@ -212,7 +212,7 @@ floppy_error:
     jmp wait_key_and_reboot
 
 kernel_not_found_error:
-    mov si, msg_kernel_not_found
+    mov si, msg_stage2_not_found
     call puts
     jmp wait_key_and_reboot
 
@@ -358,9 +358,9 @@ disk_reset:
 
 msg_loading:            db 'Loading', ENDL, 0
 msg_read_error:         db 'Error reading disk!', ENDL, 0
-msg_kernel_not_found:   db 'STAGE2.BIN file not found!', ENDL, 0
-file_kernel_bin:        db 'STAGE2  BIN'
-kernel_cluster:         dw 0
+msg_stage2_not_found:   db 'STAGE2.BIN file not found!', ENDL, 0
+file_stage2_bin:        db 'STAGE2  BIN'
+stage2_cluster:         dw 0
 
 KERNEL_LOAD_SEGMENT     equ 0x2000
 KERNEL_LOAD_OFFSET      equ 0
