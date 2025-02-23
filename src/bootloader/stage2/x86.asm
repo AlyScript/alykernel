@@ -12,12 +12,13 @@ _x86_Video_WriteCharTeletype:
     ; save bx (CDECL says its callee-saved)
     push bx
 
-    ; [bp] = return address
-    ; [bp + 2] = first argument (character): bytes are converted to words -- stack must be word aligned
-    ; [bp + 4] = second argument (page)
+    ; [bp + 0] = old call frame
+    ; [bp + 2] = return address
+    ; [bp + 4] = first argument (character): bytes are converted to words -- stack must be word aligned
+    ; [bp + 6] = second argument (page)
     mov ah, 0x0E
-    mov al, [bp + 2]
-    mov bh, [bp + 4]
+    mov al, [bp + 4]
+    mov bh, [bp + 6]
 
     int 0x10
 
