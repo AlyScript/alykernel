@@ -3,5 +3,5 @@
 
 void _cdecl cstart_(uint16_t bootDrive) {
     puts("Hello, World!");
-    for (;;);
+    for (;;);                               // Forever alone loop...
 }
