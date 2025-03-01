@@ -20,7 +20,7 @@ _x86_Video_WriteCharTeletype:
     mov al, [bp + 4]
     mov bh, [bp + 6]
 
-    int 0x10
+    int 0x10                    ; int 10,E - teletype output https://stanislavs.org/helppc/int_10-e.html
 
     pop bx
 
