@@ -2,7 +2,7 @@ bits 16
 
 section _TEXT class=CODE
 
-global _x86_Video_WriteCharTeletype
+global _x86_Video_WriteCharTeletype             ; '_' character is prefixed to names when using CDECL calling convention
 _x86_Video_WriteCharTeletype:
     
     ; make new stack frame
