@@ -26,6 +26,7 @@ void puts(const char* str) {
 
 int* printf_number(int* argp, int length, bool sign, int radix);
 
+// See https://en.cppreference.com/w/c/io/fprintf for spec. We omit some features.
 void _cdecl printf(const char* fmt, ...) {
     int* argp = (int*) (&fmt + 1);
     int state = PRINTF_STATE_NORMAL;
@@ -89,7 +90,7 @@ void _cdecl printf(const char* fmt, ...) {
                                 }
                                 break;
 
-                                case '%':   putc('%');
+                    case '%':   putc('%');
                                 break;
 
                     case 'd':
@@ -115,7 +116,7 @@ void _cdecl printf(const char* fmt, ...) {
                     default:    break;
                 }
 
-                // reset state
+                // reset state and variables to default
                 state = PRINTF_STATE_NORMAL;
                 length = PRINTF_LENGTH_DEFAULT;
                 radix = 10;
@@ -126,3 +127,4 @@ void _cdecl printf(const char* fmt, ...) {
         fmt++;
     }
 }
+
