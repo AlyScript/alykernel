@@ -184,7 +184,8 @@ int* printf_number(int* argp, int length, bool sign, int radix) {
 
     // convert number to ASCII
     do {
-        uint32_t remainder = number % radix;
+        uint32_t remainder;
+        x86_div64_32(number, radix, &number, &remainder);
         buffer[pos++] = g_HexDigits[remainder];
     } while (number > 0);
 
@@ -193,9 +194,9 @@ int* printf_number(int* argp, int length, bool sign, int radix) {
         buffer[pos++] = '-';
 
     // print number in reverse order
-    while (--pos >= 0) {
+    while (--pos >= 0)
         putc(buffer[pos]);
-    }
+    
     return argp;
 }
 
