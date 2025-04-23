@@ -1,9 +1,11 @@
 <img src="https://i.imgur.com/Jo7l9Q1.png" alt="logo" width="1000">
 
-alykernel is a simple kernel designed for the x86 architecture.
+alykernel is a simple kernel designed for the x86_32 architecture.
 
 
-## Run Locally
+## Usage
+
+You can use alykernel simply with [qemu](https://www.qemu.org/). It is not recommended to attempt to boot natively.
 
 Clone the project
 
