@@ -19,7 +19,7 @@ Go to the project directory
   cd alykernel
 ```
 
-Build the docker image
+Pull the docker image
 
 ```bash
   docker pull alyscript/alykernel:latest
