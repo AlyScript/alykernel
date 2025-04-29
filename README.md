@@ -20,13 +20,13 @@ Go to the project directory
 Build the docker image
 
 ```bash
-  docker build -t riscv-env .
+  docker pull alyscript/alykernel:latest
 ```
 
 Run the container
 
 ```bash
-  docker run --rm -it -v $(pwd):/alykernel riscv-env
+  docker run --rm -it -v $(pwd):/alykernel alyscript/alykernel:latest
 ```
 
 Build the project
