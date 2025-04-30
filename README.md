@@ -100,5 +100,5 @@ The [mtools](https://www.gnu.org/software/mtools/) package (one of the dependenc
 
 ### Calling Conventions
 We use the [CDECL](https://en.wikipedia.org/wiki/X86_calling_conventions#cdecl) calling convention.
-The name-decoration convention states that when __cdecl functions are called in C, we remove the '_' prefix from the function signature.
-So if we want to call the function `void _cdecl cstart_(uint16_t bootDrive)` from an assembly program, we need to prepend the '_' to the function name in our call: `call _cstart_`.
+The name-decoration convention states that when __cdecl functions are called in C, we remove the '`_`' prefix from the function signature.
+So if we want to call the function `void _cdecl cstart_(uint16_t bootDrive)` from an assembly program, we need to prepend the '`_`' to the function name in our call: `call _cstart_`.
