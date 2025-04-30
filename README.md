@@ -41,6 +41,8 @@ To the clean the build directory
   make clean
 ```
 
+### Booting
+
 You can now boot alykernel! To do this using [qemu](https://www.qemu.org/), first download qemu-system-i386 using an appropriate package manager. For example on a Mac you might be using Homebrew:
 ```bash
   brew install qemu-system-i386
