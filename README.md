@@ -1,6 +1,6 @@
 <img src="https://i.imgur.com/Jo7l9Q1.png" alt="logo" width="1000">
 
-alykernel is a simple kernel designed for the x86 (32 bit) architecture.
+**alykernel** is a simple kernel built for the x86 (32 bit).
 
 
 ## Usage
